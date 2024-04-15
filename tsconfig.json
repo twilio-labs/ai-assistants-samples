@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "allowJs": true
+  },
+  "include": ["node_modules/@twilio-labs/serverless-runtime-types/index.d.ts"]
+}
