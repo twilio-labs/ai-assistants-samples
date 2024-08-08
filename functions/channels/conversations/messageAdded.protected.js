@@ -14,6 +14,10 @@ exports.handler = async function (context, event, callback) {
   const assistantSid = await getAssistantSid(context, event);
 
   const { ConversationSid, ChatServiceSid, Author } = event;
+  const AssistantIdentity =
+    typeof event.AssistantIdentity === "string"
+      ? event.AssistantIdentity
+      : undefined;
 
   let identity = Author.includes(":") ? Author : `user_id:${Author}`;
 
@@ -42,6 +46,11 @@ exports.handler = async function (context, event, callback) {
   }
 
   const token = await signRequest(context, event);
+  const params = new URLSearchParams();
+  params.append("_token", token);
+  if (typeof AssistantIdentity === "string") {
+    params.append("_assistantIdentity", AssistantIdentity);
+  }
   const body = {
     Body: event.Body,
     Identity: identity,
@@ -49,7 +58,7 @@ exports.handler = async function (context, event, callback) {
     // using a callback to handle AI Assistant responding
     Webhook: `https://${
       context.DOMAIN_NAME
-    }/channels/conversations/response?_token=${encodeURIComponent(token)}`,
+    }/channels/conversations/response?${params.toString()}`,
   };
 
   const response = new Twilio.Response();

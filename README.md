@@ -109,7 +109,7 @@ Tool to enable your Assistant to search Google Maps for the full address, phone 
 
 ### Flex Handover
 
-Tool to hand over a conversation that the Assistant is handling to a human.
+Tool for your AI Assistant to hand over a conversation to a human agent.
 
 > [!IMPORTANT]
 > Requires:
@@ -130,14 +130,14 @@ Tool to hand over a conversation that the Assistant is handling to a human.
 
 Tool to hand over a conversation that the Assistant is handling to a Studio flow. While there is an example `Description` for the Tool you want to update this to match your handover criteria.
 
-This Tool rewires the conversation from your Assistant to Studio but does not forward the last message to the Studio flow. Instead the Tool will by default respond with `Conversation handed over` which might prompt the Assistant to say something like "I handed this conversation over". If you want to manipulate this message you can pass a different message into the Tool URL using the `successMessage` query parameter.
+This Tool rewires the conversation from your Assistant to Studio but does not forward the last message to the Studio flow. Instead the Tool will by default respond with `Conversation handed over` which might prompt the Assistant to say something like "I handed this conversation over". If you want to manipulate this message you can pass a different message into the Tool URL using the `SuccessMessage` query parameter.
 
 > [!IMPORTANT]
 > Requires:
 >
 > 1. The use of [Twilio Conversations as channel](#conversations-channel)
 > 2. The Assistant & these Functions to be deployed in the same account as Studio flow
-> 3. You either need to configure the `STUDIO_FLOW_SID` or pass `flowSid` as query parameter to the Tool URL.
+> 3. You either need to configure the `STUDIO_FLOW_SID` or pass `FlowSid` as query parameter to the Tool URL.
 
 | Field           | Configuration                                                   |
 | --------------- | --------------------------------------------------------------- |
