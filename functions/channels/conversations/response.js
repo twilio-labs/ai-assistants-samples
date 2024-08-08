@@ -13,6 +13,18 @@ exports.handler = async function (context, event, callback) {
     if (!verifyRequest(context, event)) {
       return callback(new Error("Invalid token"));
     }
+    console.log("response", event);
+    const assistantIdentity =
+      typeof event._assistantIdentity === "string"
+        ? event._assistantIdentity
+        : undefined;
+
+    if (event.Status === "Failed") {
+      console.error(event);
+      return callback(
+        new Error("Failed to generate response. Check error logs.")
+      );
+    }
 
     const client = context.getTwilioClient();
 
@@ -39,6 +51,7 @@ exports.handler = async function (context, event, callback) {
       .conversations(conversationsSid)
       .messages.create({
         body,
+        author: assistantIdentity,
       });
 
     console.log(`conversation message sent ${message.sid}`);

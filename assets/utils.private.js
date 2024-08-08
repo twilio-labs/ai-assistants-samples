@@ -14,7 +14,7 @@ async function sendMessageToAssistant(context, assistantSid, body) {
   const url = `https://assistants${environmentPrefix}.twilio.com/v1/${assistantSid}/Messages`;
 
   // Attention! There's explicitly no "await" since we want to do a "fire & forget"
-  fetch(url, {
+  const response = await fetch(url, {
     method: "POST",
     body: JSON.stringify(body),
     headers: {
@@ -26,10 +26,14 @@ async function sendMessageToAssistant(context, assistantSid, body) {
       Accept: "application/json",
     },
   });
-  // waiting for a second to make sure the request gets sent
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log("Sent message to AI Assistant");
-  return;
+  if (response.ok) {
+    console.log("Sent message to AI Assistant");
+    return;
+  } else {
+    throw new Error(
+      "Failed to send request to AI Assistants. " + (await response.text())
+    );
+  }
 }
 
 /**
@@ -75,10 +79,14 @@ async function getAssistantSid(context, event) {
       console.log("Invalid attribute structure", err);
     }
   }
-  const assistantSid = event.AssistantSid || context.ASSISTANT_SID;
+  const assistantSid =
+    event.AssistantId ||
+    context.ASSISTANT_ID ||
+    event.AssistantSid ||
+    context.ASSISTANT_SID;
 
   if (!assistantSid) {
-    throw new Error("Missing Assistant SID configuration");
+    throw new Error("Missing Assistant ID configuration");
   }
 
   return assistantSid;

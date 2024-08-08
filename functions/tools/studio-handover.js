@@ -19,7 +19,7 @@ exports.handler = async function (context, event, callback) {
       .split("/");
 
     console.log("attempting handover");
-    const flowSid = event.flowSid || context.STUDIO_FLOW_SID;
+    const flowSid = event.FlowSid || event.flowSid || context.STUDIO_FLOW_SID;
     if (!flowSid) {
       console.error("Missing flow sid");
       return callback(new Error("Unable to hand over conversation"));
@@ -36,7 +36,11 @@ exports.handler = async function (context, event, callback) {
       });
 
     console.log("handed over");
-    return callback(null, event.successMessage ?? "Conversation handed over");
+    const successMessage =
+      event.SuccessMessage ??
+      event.successMessage ??
+      "Conversation handed over";
+    return callback(null, successMessage);
   } catch (err) {
     console.error(err);
     return callback(null, "Could not handover");
