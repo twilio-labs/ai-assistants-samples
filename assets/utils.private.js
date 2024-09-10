@@ -2,18 +2,17 @@ const { sign, decode } = require("jsonwebtoken");
 
 /**
  * @param {import('@twilio-labs/serverless-runtime-types/types').Context} context
- * @param {string} assistantSid
+ * @param {string} assistantId
  * @param {*} body
  */
-async function sendMessageToAssistant(context, assistantSid, body) {
+async function sendMessageToAssistant(context, assistantId, body) {
   const environmentPrefix = context.TWILIO_REGION?.startsWith("stage")
     ? ".stage"
     : context.TWILIO_REGION?.startsWith("dev")
     ? ".dev"
     : "";
-  const url = `https://assistants${environmentPrefix}.twilio.com/v1/${assistantSid}/Messages`;
+  const url = `https://assistants${environmentPrefix}.twilio.com/v1/Assistants/${assistantId}/Messages`;
 
-  // Attention! There's explicitly no "await" since we want to do a "fire & forget"
   const response = await fetch(url, {
     method: "POST",
     body: JSON.stringify(body),
