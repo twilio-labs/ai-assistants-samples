@@ -15,6 +15,7 @@
     "exa-js": "^1.0.12",
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.1.21",
+    "neo4j-driver": "^5.24.1",
     "twilio": "^3.56"
   },
   "devDependencies": {
