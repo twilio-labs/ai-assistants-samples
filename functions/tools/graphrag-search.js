@@ -1,4 +1,7 @@
-const { OpenAIEmbeddings } = require("@langchain/openai");
+const {
+  HuggingFaceInferenceEmbeddings,
+} = require("@langchain/community/embeddings/hf");
+
 const {
   Neo4jVectorStore,
 } = require("@langchain/community/vectorstores/neo4j_vector");
@@ -17,13 +20,19 @@ exports.handler = async function (context, event, callback) {
     textNodeProperties: ["text"], // List of properties to use as text for the nodes
   };
 
+  const embeddings = new HuggingFaceInferenceEmbeddings({
+    apiKey: process.env.HUGGINGFACE_API_KEY, // In Node.js defaults to process.env.HUGGINGFACEHUB_API_KEY
+    model: "sentence-transformers/all-MiniLM-L6-v2",
+  });
+  console.log("setup complete");
+  console.log(await embeddings.embedQuery("security risks"));
   // You should have a populated Neo4j database to use this method
   const neo4jVectorIndex = await Neo4jVectorStore.fromExistingGraph(
-    new OpenAIEmbeddings(),
+    embeddings,
     config
   );
 
-  await neo4jVectorIndex.close();
+  console.log("search");
 
   const results = await neo4jVectorIndex.similaritySearch("security risks", 10);
 
