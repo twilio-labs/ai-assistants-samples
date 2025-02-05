@@ -11,9 +11,9 @@ exports.handler = async function(context, event, callback) {
   const assistantSid = await getAssistantSid(context, event);
   let greeting = event.greeting;
   if (greeting == '$VOICE_GREETING') {
+    // Modify this parameter to customize your Assistant's default greeting
     greeting = "Thanks for calling; how can I help you?"
   }
-  // Modify this parameter to customize your Assistant's greeting
   const twiml = `
     <Response>
       <Connect>
