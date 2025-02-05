@@ -78,19 +78,42 @@
       let assistantIdPlaceholder =
         localStorage.getItem("AI_ASSISTANT_ID") || "$ASSISTANT_ID";
 
-      function updateAiAssistantId(newId) {
-        if (newId.length === 0 || !newId) {
-          newId = "$ASSISTANT_ID";
-        }
+      let voiceGreetingPlaceholder =
+        localStorage.getItem("VOICE_GREETING") || "$VOICE_GREETING";
 
+      function updateUrls(id, voiceGreeting) {
         const functionRoots = document.querySelectorAll("input.function-root");
 
         functionRoots.forEach((element) => {
           const baseUrl = new URL(location.href);
           let url = `${baseUrl.protocol}//${baseUrl.host}${element.dataset.path}`;
-          url = url.replace("$ASSISTANT_ID", newId);
-          element.value = url.replace(assistantIdPlaceholder, newId);
+
+          url = url.replace("$ASSISTANT_ID", id);
+          element.value = url.replace(assistantIdPlaceholder, id);
+
+          const encodedGreeting = encodeURIComponent(voiceGreeting)
+          url = url.replace("$VOICE_GREETING", encodedGreeting)
+          element.value = url.replace(voiceGreetingPlaceholder, encodedGreeting);
         });
+      }
+
+      function updateVoiceGreeting(newVoiceGreeting) {
+        if (newVoiceGreeting.length === 0 || !newVoiceGreeting) {
+          newVoiceGreeting = "$VOICE_GREETING";
+        }
+
+        updateUrls(assistantIdPlaceholder, newVoiceGreeting);
+
+        voiceGreetingPlaceholder = newVoiceGreeting;
+        localStorage.setItem("VOICE_GREETING", voiceGreetingPlaceholder);
+      }
+
+      function updateAiAssistantId(newId) {
+        if (newId.length === 0 || !newId) {
+          newId = "$ASSISTANT_ID";
+        }
+
+        updateUrls(newId, voiceGreetingPlaceholder);
 
         const assistantIdPlaceholderElements = document.querySelectorAll(
           "code.assistant-placeholder"
@@ -111,10 +134,13 @@
       window.addEventListener("DOMContentLoaded", (_event) => {
         handleCopyToClipboard();
         updateAiAssistantId(assistantIdPlaceholder);
+        updateVoiceGreeting(voiceGreetingPlaceholder);
 
         if (assistantIdPlaceholder !== "$ASSISTANT_ID") {
-          document.getElementById("assistant-id").value =
-            assistantIdPlaceholder;
+          document.getElementById("assistant-id").value = assistantIdPlaceholder;
+        }
+        if (voiceGreetingPlaceholder !== "$VOICE_GREETING") {
+          document.getElementById("voice-greeting").value = voiceGreetingPlaceholder;
         }
 
         document
@@ -122,8 +148,16 @@
           .addEventListener("change", (event) => {
             updateAiAssistantId(event.target.value);
           });
-        document.querySelector("form").addEventListener("submit", (event) => {
-          event.preventDefault();
+        document
+          .getElementById("voice-greeting")
+          .addEventListener("change", (event) => {
+            updateVoiceGreeting(event.target.value);
+          });
+
+        document.querySelectorAll("form").forEach((form) => {
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+          });
         });
       });
     </script>
@@ -623,7 +657,7 @@
             />
           </div>
           </details>
-          <details open>
+          <details>
           <summary class="channel">
             <svg
               role="img"
@@ -643,7 +677,64 @@
             </svg>
             <h3 id="voice">Voice</h3>
           </summary>
-          <p>Coming soon...</p>
+          <p>
+            Follow these steps to connect your Assistant to a Twilio number for incoming calls.
+          </p>
+          <ol class="steps">
+            <li>
+              Get a
+              <a
+                href="https://www.twilio.com/console/phone-numbers/incoming"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Voice-compatible Twilio phone number</a
+              >
+            </li>
+            <li>
+              Define the greeting you'd like your Assistant to start the call with below.
+              If you don't specify a greeting, your Assistant will start the call with a generic default greeting.
+            </li>
+            <li>
+              Open up the configuration screen of your phone number.
+            </li>
+            <li>
+              Set the Voice Configuration to use the "Webhook, TwiML Bin, Function, Studio Flow, Proxy Service" option.
+              Then set your number's "When a message comes in" webhook
+              to the URL below.
+            </li>
+            <li>Save your configuration</li>
+            <li>
+              Make a call to your phone number and you should get a
+              response from your Assistant.
+            </li>
+          </ol>
+          <form>
+            <label for="assistant-id">Custom voice greeting</label>
+            <input
+              type="text"
+              id="voice-greeting"
+              class=""
+              placeholder="Thanks for calling! How can I help you?"
+            />
+          </form>
+          <label for="voice-webhook">"When a call comes in" Webhook URL</label>
+          <div class="copy-input-wrapper">
+            <input
+              type="text"
+              id="voice-webhook"
+              class="function-root"
+              readonly="true"
+              data-path="/channels/voice/incoming-call?AssistantId=$ASSISTANT_ID&greeting=$VOICE_GREETING"
+            />
+          </div>
+          <p>
+            <a
+              href="https://www.twilio.com/docs/alpha/ai-assistants/code-samples/channel-voice"
+              target="_blank"
+              rel="noopener"
+              >Check out our documentation for more detailed instructions</a
+            >.
+          </p>
           </details>
         </section>
         <section>
